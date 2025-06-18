@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/sheet'
 import { ThemeSwitch } from '../theme-switch'
 import { Button, buttonVariants } from '../ui/button'
-import { UserNav } from './UserNav'
+import { NavUser } from './nav-user'
 
 interface RouteProps {
   href: string
@@ -25,8 +25,8 @@ interface RouteProps {
 
 const routeList: RouteProps[] = [
   {
-    href: '/properties',
-    label: 'Properties',
+    href: '#features',
+    label: 'Features',
   },
   {
     href: '#testimonials',
@@ -118,11 +118,7 @@ export const Navbar = () => {
 
           <div className='hidden gap-2 md:flex'>
             <ThemeSwitch />
-            <Button asChild variant={'secondary'}>
-              <Link to='/sign-up'>Sign Up</Link>
-            </Button>
-
-            <UserNav />
+            <NavUser />
           </div>
         </NavigationMenuList>
       </NavigationMenu>

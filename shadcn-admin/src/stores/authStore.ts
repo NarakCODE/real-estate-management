@@ -1,22 +1,39 @@
+// src/stores/authStore.ts
 import { create } from 'zustand'
-import type { User } from '@/features/auth/types'
+
+// Define the shape of the user object based on your backend IUser model
+interface User {
+  _id: string
+  name: string
+  email: string
+  roleId: string
+  roleName: string
+  phone?: string
+  avatarUrl?: string
+  bio?: string
+}
 
 interface AuthState {
   user: User | null
   isAuthenticated: boolean
-  login: (userData: User) => void
-  logout: () => void
+  isLoading: boolean // To handle the initial session check
+  setUser: (user: User | null) => void
+  setAuthenticated: (isAuthenticated: boolean) => void
+  setLoading: (isLoading: boolean) => void
+  reset: () => void
 }
 
-export const useAuthStore = create<AuthState>()((set) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
-  login: (userData) =>
+  isLoading: true, // Start loading to check for an existing session on app load
+  setUser: (user) => set({ user }),
+  setAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
+  setLoading: (isLoading) => set({ isLoading }),
+  reset: () =>
     set({
-      user: userData,
-      isAuthenticated: true,
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
     }),
-  logout: () => {
-    set({ user: null, isAuthenticated: false })
-  },
 }))

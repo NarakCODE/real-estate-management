@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Camera } from 'lucide-react'
+import { Image } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
   Carousel,
@@ -71,7 +71,7 @@ export function ImageLightboxCarousel({
       <DialogTrigger asChild>
         <button
           className={cn(
-            'focus:ring-ring relative h-full w-full overflow-hidden rounded-md transition-opacity hover:opacity-80 focus:ring-2 focus:ring-offset-2 focus:outline-none',
+            'focus:ring-ring relative flex h-full w-full items-center justify-center overflow-hidden rounded-md transition-opacity hover:opacity-80 focus:ring-2 focus:ring-offset-2 focus:outline-none',
             triggerClassName
           )}
           aria-label={`Open gallery with ${images.length} images`}
@@ -82,9 +82,13 @@ export function ImageLightboxCarousel({
             className='h-full w-full object-cover'
           />
           {images.length > 1 && (
-            <div className='bg-card text-muted-foreground absolute right-1 bottom-1 flex items-center gap-2 rounded px-3 py-1 text-sm'>
-              <Camera className='h-3 w-3' />
-              {images.length}
+            <div className='h-full w-full'>
+              <div className='pointer-events-none absolute inset-0 flex items-center justify-center'>
+                <div className='flex items-center gap-2 rounded bg-black/80 px-3 py-2 text-sm text-white'>
+                  <Image className='h-5 w-5' />
+                  {images.length}
+                </div>
+              </div>
             </div>
           )}
         </button>

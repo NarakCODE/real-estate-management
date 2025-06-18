@@ -6,6 +6,9 @@ import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  define: {
+    'process.env': {},
+  },
   plugins: [
     TanStackRouterVite({
       target: 'react',

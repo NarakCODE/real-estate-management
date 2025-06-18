@@ -1,13 +1,19 @@
-import { Link } from '@tanstack/react-router'
+// src/components/layout/nav-user.tsx
+import { useMutation } from '@tanstack/react-query'
+import { Link, useNavigate } from '@tanstack/react-router'
 import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
+  BoltIcon,
+  ChevronDownIcon,
   CreditCard,
-  LogOut,
+  LogOutIcon,
+  UserPenIcon,
+  Bell,
   Sparkles,
 } from 'lucide-react'
+import { toast } from 'sonner'
+import { useAuthStore } from '@/stores/authStore'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,98 +23,140 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from '@/components/ui/sidebar'
+import { logout } from '@/features/auth/api/authAPI'
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string
-    email: string
-    avatar: string
+export function NavUser() {
+  const navigate = useNavigate()
+
+  const { reset, user, isAuthenticated } = useAuthStore()
+
+  const mutation = useMutation({
+    mutationFn: logout,
+    onSuccess: (data) => {
+      toast.success(data.message)
+      reset()
+      navigate({ to: '/sign-in' })
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Logout failed.')
+    },
+  })
+
+  // We won't render anything if there's no authenticated user.
+  if (!user && !isAuthenticated) {
+    return (
+      <div className='flex space-x-2'>
+        <Button asChild variant={'secondary'} size={'lg'}>
+          <Link to='/sign-up'>Sign Up</Link>
+        </Button>
+        <Button asChild size={'lg'}>
+          <Link to='/sign-in'>Login</Link>
+        </Button>
+      </div>
+    )
   }
-}) {
-  const { isMobile } = useSidebar()
 
   return (
-    <SidebarMenu>
-      <SidebarMenuItem>
+    <div className='flex space-x-2'>
+      <>
+        {user?.roleName === 'Admin' && (
+          <Button asChild variant='ghost' className='hidden sm:flex'>
+            <Link to='/'>
+              <Sparkles className='mr-2 size-4' />
+              Dashboard
+            </Link>
+          </Button>
+        )}
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size='lg'
-              className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
+            {/* This trigger is a simple button and has no dependency on the sidebar */}
+            <Button
+              variant='ghost'
+              className='flex h-auto items-center gap-x-2 p-1 hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0'
             >
-              <Avatar className='h-8 w-8 rounded-lg'>
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className='rounded-lg'>SN</AvatarFallback>
+              <Avatar className='size-8'>
+                <AvatarImage src={user?.avatarUrl} alt={user?.name} />
+                <AvatarFallback>
+                  {user?.name.charAt(0).toUpperCase()}
+                </AvatarFallback>
               </Avatar>
-              <div className='grid flex-1 text-left text-sm leading-tight'>
-                <span className='truncate font-semibold'>{user.name}</span>
-                <span className='truncate text-xs'>{user.email}</span>
-              </div>
-              <ChevronsUpDown className='ml-auto size-4' />
-            </SidebarMenuButton>
+              <ChevronDownIcon
+                size={16}
+                className='opacity-60'
+                aria-hidden='true'
+              />
+            </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className='w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg'
-            side={isMobile ? 'bottom' : 'right'}
-            align='end'
-            sideOffset={4}
-          >
-            <DropdownMenuLabel className='p-0 font-normal'>
-              <div className='flex items-center gap-2 px-1 py-1.5 text-left text-sm'>
-                <Avatar className='h-8 w-8 rounded-lg'>
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className='rounded-lg'>SN</AvatarFallback>
-                </Avatar>
-                <div className='grid flex-1 text-left text-sm leading-tight'>
-                  <span className='truncate font-semibold'>{user.name}</span>
-                  <span className='truncate text-xs'>{user.email}</span>
-                </div>
-              </div>
+          <DropdownMenuContent className='w-64' align='end' sideOffset={8}>
+            <DropdownMenuLabel className='flex min-w-0 flex-col font-normal'>
+              <span className='text-foreground truncate text-sm font-medium'>
+                {user?.name}
+              </span>
+              <span className='text-muted-foreground truncate text-xs font-normal'>
+                {user?.email}
+              </span>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
                 <Link to='/settings/account'>
-                  <BadgeCheck />
-                  Account
+                  <UserPenIcon
+                    size={16}
+                    className='mr-2 opacity-60'
+                    aria-hidden='true'
+                  />
+                  <span>Account Settings</span>
                 </Link>
               </DropdownMenuItem>
+              <DropdownMenuItem>
+                <BoltIcon
+                  size={16}
+                  className='mr-2 opacity-60'
+                  aria-hidden='true'
+                />
+                <span>Upgrade to Pro</span>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
               <DropdownMenuItem asChild>
                 <Link to='/settings'>
-                  <CreditCard />
-                  Billing
+                  <CreditCard
+                    size={16}
+                    className='mr-2 opacity-60'
+                    aria-hidden='true'
+                  />
+                  <span>Billing & Invoices</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to='/settings/notifications'>
-                  <Bell />
-                  Notifications
+                  <Bell
+                    size={16}
+                    className='mr-2 opacity-60'
+                    aria-hidden='true'
+                  />
+                  <span>Notifications</span>
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOut />
-              Log out
+            <DropdownMenuItem
+              onClick={() => mutation.mutate()}
+              disabled={mutation.isPending}
+              className='focus:bg-destructive focus:text-destructive-foreground'
+            >
+              <LogOutIcon
+                size={16}
+                className='mr-2 opacity-60'
+                aria-hidden='true'
+              />
+              <span>{mutation.isPending ? 'Logging out...' : 'Logout'}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
+      </>
+    </div>
   )
 }
