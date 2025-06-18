@@ -1,4 +1,5 @@
 // src/components/layout/nav-user.tsx
+import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import {
@@ -8,7 +9,6 @@ import {
   LogOutIcon,
   UserPenIcon,
   Bell,
-  Sparkles,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/authStore'
@@ -24,23 +24,40 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { logout } from '@/features/auth/api/authAPI'
+import { ConfirmDialog } from '../confirm-dialog'
+import { Skeleton } from '../ui/skeleton'
 
 export function NavUser() {
   const navigate = useNavigate()
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false)
 
-  const { reset, user, isAuthenticated } = useAuthStore()
+  const { reset, user, isAuthenticated, isLoading } = useAuthStore()
 
   const mutation = useMutation({
     mutationFn: logout,
     onSuccess: (data) => {
       toast.success(data.message)
       reset()
-      navigate({ to: '/sign-in' })
+      navigate({ to: '/landing' })
     },
     onError: (error) => {
       toast.error(error.message || 'Logout failed.')
     },
   })
+
+  const handleLogoutConfirm = () => {
+    mutation.mutate()
+    setShowLogoutDialog(false)
+  }
+
+  // Show skeleton while loading user/auth state
+  if (isLoading) {
+    return (
+      <div className='flex space-x-2'>
+        <Skeleton className='h-10 w-32 rounded-full' />
+      </div>
+    )
+  }
 
   // We won't render anything if there's no authenticated user.
   if (!user && !isAuthenticated) {
@@ -59,15 +76,6 @@ export function NavUser() {
   return (
     <div className='flex space-x-2'>
       <>
-        {user?.roleName === 'Admin' && (
-          <Button asChild variant='ghost' className='hidden sm:flex'>
-            <Link to='/'>
-              <Sparkles className='mr-2 size-4' />
-              Dashboard
-            </Link>
-          </Button>
-        )}
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             {/* This trigger is a simple button and has no dependency on the sidebar */}
@@ -143,9 +151,9 @@ export function NavUser() {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={() => mutation.mutate()}
+              onClick={() => setShowLogoutDialog(true)}
               disabled={mutation.isPending}
-              className='focus:bg-destructive focus:text-destructive-foreground'
+              variant='destructive'
             >
               <LogOutIcon
                 size={16}
@@ -157,6 +165,17 @@ export function NavUser() {
           </DropdownMenuContent>
         </DropdownMenu>
       </>
+      <ConfirmDialog
+        open={showLogoutDialog}
+        onOpenChange={setShowLogoutDialog}
+        title='Sign Out'
+        desc='Are you sure you want to sign out of your account?'
+        confirmText='Sign Out'
+        cancelBtnText='Cancel'
+        destructive={true}
+        isLoading={mutation.isPending}
+        handleConfirm={handleLogoutConfirm}
+      />
     </div>
   )
 }

@@ -193,9 +193,13 @@ function PropertyDetailsPage() {
                 <div className='flex items-center justify-between'>
                   <div className='flex items-center gap-3'>
                     <Avatar className='h-12 w-12'>
-                      <AvatarImage
-                        src={`https://i.pravatar.cc/150?u=${agentId?.email}`}
-                      />
+                      {agentId?.avatarUrl ? (
+                        <AvatarImage src={agentId.avatarUrl} />
+                      ) : (
+                        <AvatarImage
+                          src={`https://i.pravatar.cc/150?u=${agentId?.email}`}
+                        />
+                      )}
                       <AvatarFallback>
                         {agentId?.name?.slice(0, 2).toUpperCase()}
                       </AvatarFallback>
@@ -259,11 +263,11 @@ function FeatureItem({
 }) {
   return (
     <div className='text-muted-foreground flex flex-col gap-3'>
+      <Label>{label}</Label>
       <div className='flex items-center gap-2'>
         {icon}
-        <Label>{label}</Label>
+        <p className='text-base'>{value}</p>
       </div>
-      <p className='text-base'>{value}</p>
     </div>
   )
 }

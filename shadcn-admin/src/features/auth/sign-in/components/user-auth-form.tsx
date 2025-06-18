@@ -39,12 +39,10 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       setUser(user)
       setAuthenticated(true)
       // Redirect to the intended page or dashboard
-      navigate({ to: redirect || '/' })
+      navigate({ to: redirect || '/landing' })
     },
-    onError: (error) => {
-      toast.error(
-        error.message || 'Login failed. Please check your credentials.'
-      )
+    onError: (_error) => {
+      toast.error('Wrong email or password')
     },
   })
 

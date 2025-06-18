@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/sheet'
 import { ThemeSwitch } from '../theme-switch'
 import { Button, buttonVariants } from '../ui/button'
+import DashboardButton from './DashboardButton'
 import { NavUser } from './nav-user'
 
 interface RouteProps {
@@ -118,6 +119,7 @@ export const Navbar = () => {
 
           <div className='hidden gap-2 md:flex'>
             <ThemeSwitch />
+            <DashboardButton />
             <NavUser />
           </div>
         </NavigationMenuList>

@@ -82,7 +82,7 @@ export function ImageLightboxCarousel({
             className='h-full w-full object-cover'
           />
           {images.length > 1 && (
-            <div className='h-full w-full'>
+            <div className='absolute inset-0 h-full w-full bg-black/50'>
               <div className='pointer-events-none absolute inset-0 flex items-center justify-center'>
                 <div className='flex items-center gap-2 rounded bg-black/80 px-3 py-2 text-sm text-white'>
                   <Image className='h-5 w-5' />
