@@ -2,10 +2,6 @@ import UserModel, { type IUser } from "../models/user.model";
 import { z } from "zod";
 import RoleModel from "../models/role.model";
 import { ROLE } from "../enums/role.enum";
-import { getEnv } from "../utils/get-env";
-import jwt from "jsonwebtoken";
-import session from "express-session";
-import { UnauthorizedException } from "../utils/appError";
 
 // Define Zod schemas for service input validation
 const userRegisterSchema = z.object({
@@ -53,12 +49,7 @@ export const registerUser = async (
 
 export const loginUser = async (
     credentials: UserLoginInput
-): Promise<
-    Omit<IUser, "password"> & {
-        roleName: string;
-        accessToken: string;
-    }
-> => {
+): Promise<Omit<IUser, "password"> & { roleName: string }> => {
     const validatedData = userLoginSchema.parse(credentials);
     const { email, password } = validatedData;
 
@@ -66,30 +57,20 @@ export const loginUser = async (
         .select("+password")
         .populate("roleId", "name");
 
-    if (!user || !user.password) {
-        throw new UnauthorizedException("Invalid credentials");
+    if (!user) {
+        throw new Error("Invalid credentials");
     }
 
     const isPasswordMatch = await user.comparePassword(password);
 
     if (!isPasswordMatch) {
-        throw new UnauthorizedException("Invalid credentials");
+        throw new Error("Invalid credentials");
     }
 
     const userWithoutPassword = user.omitPassword();
-    const accessToken = jwt.sign(
-        {
-            userId: user._id,
-            email: user.email,
-            role: (user.roleId as any).name,
-        },
-        getEnv("SESSION_SECRET"),
-        { expiresIn: "15m" }
-    );
 
     return {
         ...userWithoutPassword,
         roleName: (user.roleId as any).name,
-        accessToken,
     };
 };
