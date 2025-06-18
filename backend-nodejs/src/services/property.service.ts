@@ -85,7 +85,10 @@ export const getPropertiesService = async (
                 .sort(sortQuery)
                 .skip(skip)
                 .limit(limit)
-                .populate("agentId", "firstName lastName email")
+                .populate(
+                    "agentId",
+                    "name email phone avatarUrl roleId -password"
+                )
                 .lean(),
             PropertyModel.countDocuments(filterQuery),
         ]);
@@ -193,7 +196,7 @@ export const getPropertyById = async (
 ): Promise<IProperty> => {
     try {
         const response = await PropertyModel.findById(propertyId)
-            .populate("agentId", "firstName lastName email phone")
+            .populate("agentId", "name phone email avatarUrl -password")
             .lean();
 
         if (!response) {

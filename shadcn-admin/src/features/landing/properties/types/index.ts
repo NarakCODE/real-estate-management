@@ -33,6 +33,9 @@ export interface Property {
   agentId: {
     _id: string
     email: string
+    name: string
+    phone: string
+    avatarUrl: string
   }
   isFeatured: boolean
   views: number

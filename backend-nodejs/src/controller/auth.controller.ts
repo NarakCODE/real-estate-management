@@ -1,6 +1,7 @@
 import { type Request, type Response } from "express";
 import * as authService from "../services/auth.service";
 import { HTTPSTATUS } from "../config/http-status.config";
+import { asyncHandler } from "../middlewares/asyncHandler.middleware";
 
 export const register = async (req: Request, res: Response) => {
     try {
@@ -14,17 +15,19 @@ export const register = async (req: Request, res: Response) => {
     }
 };
 
-export const login = async (req: Request, res: Response) => {
-    try {
-        const user = await authService.loginUser(req.body);
+export const login = asyncHandler(async (req: Request, res: Response) => {
+    const { email, password } = req.body;
+    // Pass credentials as an object to match the updated loginUser signature
+    const user = await authService.loginUser({
+        email,
+        password,
+    });
 
-        (req.session as any).user = user;
-
-        res.status(HTTPSTATUS.OK).json({ message: "Login successful", user });
-    } catch (error: any) {
-        res.status(HTTPSTATUS.UNAUTHORIZED).json({ message: error.message });
-    }
-};
+    res.status(HTTPSTATUS.OK).json({
+        message: "Login successful",
+        user,
+    });
+});
 
 export const logout = (req: Request, res: Response) => {
     req.session.destroy((err) => {

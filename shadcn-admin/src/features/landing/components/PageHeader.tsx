@@ -1,3 +1,5 @@
+import { PageBreadcrumbs } from '@/components/layout/PageBreadcrumbs'
+
 export function PageHeader({
   title,
   subtitle,
@@ -7,6 +9,7 @@ export function PageHeader({
 }) {
   return (
     <header className='mb-8'>
+      <PageBreadcrumbs />
       <h1 className='text-foreground text-3xl font-bold tracking-tight'>
         {title}
       </h1>

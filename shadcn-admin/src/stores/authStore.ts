@@ -1,55 +1,30 @@
-import Cookies from 'js-cookie'
 import { create } from 'zustand'
-
-const ACCESS_TOKEN = 'thisisjustarandomstring'
-
-interface AuthUser {
-  accountNo: string
-  email: string
-  role: string[]
-  exp: number
-}
+import { persist } from 'zustand/middleware'
+import type { User } from '@/features/auth/types'
 
 interface AuthState {
-  auth: {
-    user: AuthUser | null
-    setUser: (user: AuthUser | null) => void
-    accessToken: string
-    setAccessToken: (accessToken: string) => void
-    resetAccessToken: () => void
-    reset: () => void
-  }
+  user: (User & { accessToken?: string; refreshToken?: string }) | null
+  isAuthenticated: boolean
+  login: (userData: User, accessToken?: string, refreshToken?: string) => void
+  logout: () => void
 }
 
-export const useAuthStore = create<AuthState>()((set) => {
-  const cookieState = Cookies.get(ACCESS_TOKEN)
-  const initToken = cookieState ? JSON.parse(cookieState) : ''
-  return {
-    auth: {
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
       user: null,
-      setUser: (user) =>
-        set((state) => ({ ...state, auth: { ...state.auth, user } })),
-      accessToken: initToken,
-      setAccessToken: (accessToken) =>
-        set((state) => {
-          Cookies.set(ACCESS_TOKEN, JSON.stringify(accessToken))
-          return { ...state, auth: { ...state.auth, accessToken } }
+      isAuthenticated: false,
+      login: (userData, accessToken, refreshToken) =>
+        set({
+          user: { ...userData, accessToken, refreshToken },
+          isAuthenticated: true,
         }),
-      resetAccessToken: () =>
-        set((state) => {
-          Cookies.remove(ACCESS_TOKEN)
-          return { ...state, auth: { ...state.auth, accessToken: '' } }
-        }),
-      reset: () =>
-        set((state) => {
-          Cookies.remove(ACCESS_TOKEN)
-          return {
-            ...state,
-            auth: { ...state.auth, user: null, accessToken: '' },
-          }
-        }),
-    },
-  }
-})
-
-// export const useAuth = () => useAuthStore((state) => state.auth)
+      logout: () => {
+        set({ user: null, isAuthenticated: false })
+      },
+    }),
+    {
+      name: 'auth-storage',
+    }
+  )
+)
