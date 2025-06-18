@@ -83,3 +83,17 @@ export interface Pagination {
   hasPrevPage: boolean
   limit: number
 }
+
+export interface Amenity {
+  _id: string
+  name: string
+  description?: string
+  iconUrl?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface AmenitiesResponse {
+  message: string
+  data: Amenity[]
+}

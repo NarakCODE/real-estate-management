@@ -30,6 +30,8 @@ import { PageBreadcrumbs } from '@/components/layout/PageBreadcrumbs'
 import LandingPageLayout from '@/components/layout/landing-layout'
 import { FavoriteToggleButton } from '@/features/favorites/components/FavoriteToggleButton'
 import PropertyImageCarousel from '@/features/landing/components/PropertyImageCarousel'
+import { AmenitiesSection } from '@/features/landing/properties/components/AmenitiesSection'
+import { useAmenities } from '@/features/landing/properties/hooks/useAmenities'
 import { useProperty } from '@/features/landing/properties/hooks/useProperties'
 
 export const Route = createFileRoute('/landing/properties/$propertiesId')({
@@ -40,14 +42,19 @@ export const Route = createFileRoute('/landing/properties/$propertiesId')({
 function PropertyDetailsPage() {
   const { propertiesId } = Route.useParams()
   const { data: property, isLoading, isError } = useProperty(propertiesId)
+  const {
+    data: amenitiesResponse,
+    isLoading: isLoadingAmenities,
+    isError: isErrorAmenities,
+  } = useAmenities()
 
   const { agentId } = property || {}
 
-  if (isLoading) {
+  if (isLoading || isLoadingAmenities) {
     return <PropertyDetailsSkeleton />
   }
 
-  if (isError || !property) {
+  if (isError || !property || isErrorAmenities) {
     return (
       <LandingPageLayout>
         <div className='container mx-auto text-center'>
@@ -137,11 +144,11 @@ function PropertyDetailsPage() {
           </div>
 
           {/* Main Content */}
-          <div className='grid grid-cols-1 gap-8 lg:grid-cols-3'>
+          <div className='grid grid-cols-1 gap-4 lg:grid-cols-3'>
             {/* Property Information */}
-            <div className='space-y-8 lg:col-span-2'>
+            <div className='space-y-4 lg:col-span-2'>
               {/* Header */}
-              <div className='rounded-2xl border p-8 shadow-sm'>
+              <div className='bg-background rounded-2xl border p-4 shadow-sm'>
                 <div className='mb-6 flex items-start justify-between'>
                   <div className='flex-1'>
                     <div className='mb-3 flex items-center gap-3'>
@@ -255,6 +262,9 @@ function PropertyDetailsPage() {
                 </CardContent>
               </Card>
 
+              {/* A */}
+              <AmenitiesSection amenities={amenitiesResponse?.data || []} />
+
               {/* Location */}
               <Card className='text-muted-foreground bg-background'>
                 <CardHeader>
@@ -286,7 +296,7 @@ function PropertyDetailsPage() {
                           {property.location.coordinates.lng}
                         </p>
                       </div> */}
-                      <div className='mt-4 w-full overflow-hidden rounded-lg border shadow-sm'>
+                      <div className='bg-background mt-4 w-full overflow-hidden rounded-lg border'>
                         <iframe
                           title='Google Map'
                           src={mapSrc}
@@ -305,11 +315,11 @@ function PropertyDetailsPage() {
             </div>
 
             {/* Sidebar */}
-            <div className='space-y-6'>
+            <div className='sticky top-0 space-y-4'>
               {/* Agent Information */}
-              <Card className='shadow-sm'>
+              <Card className='bg-background'>
                 <CardHeader>
-                  <CardTitle className='text-xl'>Listed by</CardTitle>
+                  <CardTitle className='text-lg'>Listed by</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className='space-y-4'>
@@ -346,12 +356,10 @@ function PropertyDetailsPage() {
                 </CardContent>
               </Card>
 
-              {/* Action Buttons */}
-
               {/* Property Tags */}
-              <Card className='shadow-sm'>
+              <Card className='bg-background'>
                 <CardHeader>
-                  <CardTitle className='text-xl'>Property Tags</CardTitle>
+                  <CardTitle className='text-lg'>Property Tags</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className='flex flex-wrap gap-2'>
@@ -382,9 +390,9 @@ function PropertyDetailsPage() {
               </Card>
 
               {/* Quick Stats */}
-              <Card className='shadow-sm'>
+              <Card className='bg-background'>
                 <CardHeader>
-                  <CardTitle className='text-xl'>Quick Stats</CardTitle>
+                  <CardTitle className='text-lg'>Quick Stats</CardTitle>
                 </CardHeader>
                 <CardContent className='space-y-3'>
                   <div className='flex items-center justify-between'>
@@ -470,7 +478,7 @@ function DetailItem({
 function PropertyDetailsSkeleton() {
   return (
     <LandingPageLayout>
-      <div className='min-h-screen'>
+      <div className='relative min-h-screen'>
         <div className='container mx-auto px-4 py-6'>
           {/* Hero Section Skeleton */}
           <div className='mb-8'>

@@ -1,6 +1,6 @@
 import apiClient from '@/lib/axios'
 import type { PropertySearchParams } from '../schemas'
-import type { PropertiesResponse, Property } from '../types'
+import type { AmenitiesResponse, PropertiesResponse, Property } from '../types'
 
 export async function fetchProperties(
   params: PropertySearchParams
@@ -33,4 +33,12 @@ export async function fetchPropertyById(id: string): Promise<Property> {
     throw new Error('Failed to fetch property')
   }
   return response.data.data
+}
+
+export async function fetchAmenities(): Promise<AmenitiesResponse> {
+  const response = await apiClient.get('/v1/amenities')
+  if (response.status !== 200) {
+    throw new Error('Failed to fetch amenities')
+  }
+  return response.data
 }
