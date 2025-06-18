@@ -31,6 +31,7 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as LandingSignUpIndexImport } from './routes/landing/sign-up/index'
 import { Route as LandingSignInIndexImport } from './routes/landing/sign-in/index'
 import { Route as LandingPropertiesIndexImport } from './routes/landing/properties/index'
+import { Route as LandingFavoritesIndexImport } from './routes/landing/favorites/index'
 import { Route as AuthenticatedUsersIndexImport } from './routes/_authenticated/users/index'
 import { Route as AuthenticatedTasksIndexImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedSettingsIndexImport } from './routes/_authenticated/settings/index'
@@ -164,6 +165,12 @@ const LandingSignInIndexRoute = LandingSignInIndexImport.update({
 const LandingPropertiesIndexRoute = LandingPropertiesIndexImport.update({
   id: '/landing/properties/',
   path: '/landing/properties/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const LandingFavoritesIndexRoute = LandingFavoritesIndexImport.update({
+  id: '/landing/favorites/',
+  path: '/landing/favorites/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -481,6 +488,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUsersIndexImport
       parentRoute: typeof AuthenticatedRouteImport
     }
+    '/landing/favorites/': {
+      id: '/landing/favorites/'
+      path: '/landing/favorites'
+      fullPath: '/landing/favorites'
+      preLoaderRoute: typeof LandingFavoritesIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/landing/properties/': {
       id: '/landing/properties/'
       path: '/landing/properties'
@@ -627,6 +641,7 @@ export interface FileRoutesByFullPath {
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/landing/favorites': typeof LandingFavoritesIndexRoute
   '/landing/properties': typeof LandingPropertiesIndexRoute
   '/landing/sign-in': typeof LandingSignInIndexRoute
   '/landing/sign-up': typeof LandingSignUpIndexRoute
@@ -660,6 +675,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/landing/favorites': typeof LandingFavoritesIndexRoute
   '/landing/properties': typeof LandingPropertiesIndexRoute
   '/landing/sign-in': typeof LandingSignInIndexRoute
   '/landing/sign-up': typeof LandingSignUpIndexRoute
@@ -698,6 +714,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
+  '/landing/favorites/': typeof LandingFavoritesIndexRoute
   '/landing/properties/': typeof LandingPropertiesIndexRoute
   '/landing/sign-in/': typeof LandingSignInIndexRoute
   '/landing/sign-up/': typeof LandingSignUpIndexRoute
@@ -736,6 +753,7 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/tasks'
     | '/users'
+    | '/landing/favorites'
     | '/landing/properties'
     | '/landing/sign-in'
     | '/landing/sign-up'
@@ -768,6 +786,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/tasks'
     | '/users'
+    | '/landing/favorites'
     | '/landing/properties'
     | '/landing/sign-in'
     | '/landing/sign-up'
@@ -804,6 +823,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/'
     | '/_authenticated/tasks/'
     | '/_authenticated/users/'
+    | '/landing/favorites/'
     | '/landing/properties/'
     | '/landing/sign-in/'
     | '/landing/sign-up/'
@@ -825,6 +845,7 @@ export interface RootRouteChildren {
   errors503Route: typeof errors503Route
   LandingIndexRoute: typeof LandingIndexRoute
   LandingPropertiesPropertiesIdRoute: typeof LandingPropertiesPropertiesIdRoute
+  LandingFavoritesIndexRoute: typeof LandingFavoritesIndexRoute
   LandingPropertiesIndexRoute: typeof LandingPropertiesIndexRoute
   LandingSignInIndexRoute: typeof LandingSignInIndexRoute
   LandingSignUpIndexRoute: typeof LandingSignUpIndexRoute
@@ -845,6 +866,7 @@ const rootRouteChildren: RootRouteChildren = {
   errors503Route: errors503Route,
   LandingIndexRoute: LandingIndexRoute,
   LandingPropertiesPropertiesIdRoute: LandingPropertiesPropertiesIdRoute,
+  LandingFavoritesIndexRoute: LandingFavoritesIndexRoute,
   LandingPropertiesIndexRoute: LandingPropertiesIndexRoute,
   LandingSignInIndexRoute: LandingSignInIndexRoute,
   LandingSignUpIndexRoute: LandingSignUpIndexRoute,
@@ -874,6 +896,7 @@ export const routeTree = rootRoute
         "/(errors)/503",
         "/landing/",
         "/landing/properties/$propertiesId",
+        "/landing/favorites/",
         "/landing/properties/",
         "/landing/sign-in/",
         "/landing/sign-up/"
@@ -1015,6 +1038,9 @@ export const routeTree = rootRoute
     "/_authenticated/users/": {
       "filePath": "_authenticated/users/index.tsx",
       "parent": "/_authenticated"
+    },
+    "/landing/favorites/": {
+      "filePath": "landing/favorites/index.tsx"
     },
     "/landing/properties/": {
       "filePath": "landing/properties/index.tsx"

@@ -1,7 +1,7 @@
-// src/stores/authStore.ts
+// src/stores/authStore.ts - Updated with persistence
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
-// Define the shape of the user object based on your backend IUser model
 interface User {
   _id: string
   name: string
@@ -16,24 +16,63 @@ interface User {
 interface AuthState {
   user: User | null
   isAuthenticated: boolean
-  isLoading: boolean // To handle the initial session check
+  isLoading: boolean
+  isInitialized: boolean
   setUser: (user: User | null) => void
   setAuthenticated: (isAuthenticated: boolean) => void
   setLoading: (isLoading: boolean) => void
+  setInitialized: (isInitialized: boolean) => void
+  login: (user: User) => void
+  logout: () => void
   reset: () => void
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  isAuthenticated: false,
-  isLoading: true, // Start loading to check for an existing session on app load
-  setUser: (user) => set({ user }),
-  setAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
-  setLoading: (isLoading) => set({ isLoading }),
-  reset: () =>
-    set({
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
       user: null,
       isAuthenticated: false,
-      isLoading: false,
+      isLoading: true,
+      isInitialized: false,
+      setUser: (user) => set({ user }),
+      setAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
+      setLoading: (isLoading) => set({ isLoading }),
+      setInitialized: (isInitialized) => set({ isInitialized }),
+      login: (user) =>
+        set({
+          user,
+          isAuthenticated: true,
+          isLoading: false,
+          isInitialized: true,
+        }),
+      logout: () =>
+        set({
+          user: null,
+          isAuthenticated: false,
+          isLoading: false,
+          isInitialized: true,
+        }),
+      reset: () =>
+        set({
+          user: null,
+          isAuthenticated: false,
+          isLoading: false,
+          isInitialized: false,
+        }),
     }),
-}))
+    {
+      name: 'auth-storage',
+      partialize: (state) => ({
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
+      }),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          // After rehydration, mark as not initialized to trigger session check
+          state.isInitialized = false
+          state.isLoading = true
+        }
+      },
+    }
+  )
+)
