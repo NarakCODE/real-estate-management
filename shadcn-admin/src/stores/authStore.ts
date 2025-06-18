@@ -1,30 +1,22 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 import type { User } from '@/features/auth/types'
 
 interface AuthState {
-  user: (User & { accessToken?: string; refreshToken?: string }) | null
+  user: User | null
   isAuthenticated: boolean
-  login: (userData: User, accessToken?: string, refreshToken?: string) => void
+  login: (userData: User) => void
   logout: () => void
 }
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      user: null,
-      isAuthenticated: false,
-      login: (userData, accessToken, refreshToken) =>
-        set({
-          user: { ...userData, accessToken, refreshToken },
-          isAuthenticated: true,
-        }),
-      logout: () => {
-        set({ user: null, isAuthenticated: false })
-      },
+export const useAuthStore = create<AuthState>()((set) => ({
+  user: null,
+  isAuthenticated: false,
+  login: (userData) =>
+    set({
+      user: userData,
+      isAuthenticated: true,
     }),
-    {
-      name: 'auth-storage',
-    }
-  )
-)
+  logout: () => {
+    set({ user: null, isAuthenticated: false })
+  },
+}))
