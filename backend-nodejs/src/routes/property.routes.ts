@@ -8,17 +8,17 @@ import { PERMISSION } from "../enums/permission.enum";
 const propertyRoutes = Router();
 
 propertyRoutes.post(
-  "/create",
-  isAuthenticated,
-  authorize(PERMISSION.CREATE_PROPERTY),
-  createPropertyValidation,
-  propertyController.createProperty
+    "/create",
+    isAuthenticated,
+    authorize(PERMISSION.CREATE_PROPERTY),
+    createPropertyValidation,
+    propertyController.createProperty
 );
 propertyRoutes.get("/", propertyController.getProperties);
 propertyRoutes.get(
-  "/user",
-  isAuthenticated,
-  propertyController.getUserProperties
+    "/user",
+    isAuthenticated,
+    propertyController.getUserProperties
 );
 propertyRoutes.get("/:id", propertyController.getPropertyById);
 propertyRoutes.put("/edit/:id", propertyController.updateProperty);

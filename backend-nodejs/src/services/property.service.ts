@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import PropertyModel, { IProperty } from "../models/property.model";
 import { CreatePropertyInput } from "../validations/property.validation";
 import { BadRequestException, NotFoundException } from "../utils/appError";
+import ReviewModel from "../models/review.model";
 
 export type UpdatePropertyInput = Partial<CreatePropertyInput>;
 
@@ -169,6 +170,7 @@ export const getUserProperties = async (
                 .limit(limit)
                 .lean(),
             PropertyModel.countDocuments(filterQuery),
+            ReviewModel.findOne,
         ]);
 
         // Calculate pagination info
@@ -197,6 +199,14 @@ export const getPropertyById = async (
     try {
         const response = await PropertyModel.findById(propertyId)
             .populate("agentId", "name phone email avatarUrl -password")
+            .populate({
+                path: "reviews",
+                select: "rating comment authorId createdAt",
+                populate: {
+                    path: "authorId",
+                    select: "name avatarUrl",
+                },
+            })
             .lean();
 
         if (!response) {

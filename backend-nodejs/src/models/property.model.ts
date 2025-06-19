@@ -5,6 +5,7 @@ import {
     PROPERTY_TYPE,
 } from "../enums/property.enum";
 import { slugify } from "../utils/slugify";
+import { IReview } from "./review.model";
 
 export interface ILocation {
     street?: string;
@@ -50,6 +51,7 @@ export interface IProperty extends Document {
     isFeatured: boolean;
     views: number;
     slug: string;
+    reviews: IReview[];
 }
 
 const LocationSchema = new Schema<ILocation>({
@@ -126,6 +128,15 @@ PropertySchema.pre<IProperty>("save", async function (next) {
     }
     next();
 });
+
+PropertySchema.virtual("reviews", {
+    ref: "Review",
+    localField: "_id",
+    foreignField: "propertyId",
+});
+
+PropertySchema.set("toObject", { virtuals: true });
+PropertySchema.set("toJSON", { virtuals: true });
 
 const PropertyModel = mongoose.model<IProperty>("Property", PropertySchema);
 export default PropertyModel;

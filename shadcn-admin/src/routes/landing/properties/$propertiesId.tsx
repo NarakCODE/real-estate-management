@@ -31,6 +31,7 @@ import LandingPageLayout from '@/components/layout/landing-layout'
 import { FavoriteToggleButton } from '@/features/favorites/components/FavoriteToggleButton'
 import PropertyImageCarousel from '@/features/landing/components/PropertyImageCarousel'
 import { AmenitiesSection } from '@/features/landing/properties/components/AmenitiesSection'
+import ReviewsSection from '@/features/landing/properties/components/ReviewsSection'
 import { useAmenities } from '@/features/landing/properties/hooks/useAmenities'
 import { useProperty } from '@/features/landing/properties/hooks/useProperties'
 
@@ -312,6 +313,9 @@ function PropertyDetailsPage() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Reviews */}
+              <ReviewsSection reviews={property.reviews} />
             </div>
 
             {/* Sidebar */}

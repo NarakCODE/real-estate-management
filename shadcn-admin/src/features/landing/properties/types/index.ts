@@ -42,9 +42,25 @@ export interface Property {
   createdAt: string
   updatedAt: string
   slug: string
-  __v: number
+  reviews: Review[]
 }
 
+export interface Author {
+  _id: string
+  name: string
+  roleId: string
+  avatarUrl: string | null
+}
+
+export interface Review {
+  _id: string
+  authorId: Author
+  propertyId: string
+  rating: number
+  comment: string
+  createdAt: string // ISO date string
+  updatedAt: string // ISO date string
+}
 export interface PropertiesResponse {
   message: string
   data: Property[]
